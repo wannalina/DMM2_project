@@ -1,11 +1,25 @@
 package ProjectWork
 
 import scala.io.StdIn   // perform basic I/O operations
+import scala.io.Source
 import java.time.LocalTime  // library to get current time
 import java.time.format.DateTimeFormatter   // format current time
 
 /* Renewable Energy Plant System control system program */
 case object REPS extends App {
+
+  /* function to read contents of .csv file */
+  def read_file(filename: String): Unit = {     // THIS FUNCTION IS STILL UNDER CONSTRUCTION
+    val source = Source.fromFile(filename)
+    try {
+      for (line <- source.getLines()) {
+        val fields = line.split(",")
+        println(fields.mkString(","))     // DO SOMETHING ELSE, NOT PRINT
+      }
+    } finally {
+      source.close()
+    }
+  }
 
   // energy generation mechanism super class
   class EnergyMechanism(val id_num: String, var current_pos: String)
@@ -41,7 +55,7 @@ case object REPS extends App {
   // print basic information about REPS to user
   println("Hello and welcome to the Renewable Energy Plant System (REPS)!")
   println("This is multigeneration energy system plant that manages the production of renewable energy for cities and industries.\n" +
-    "Through this system interface, you will be able to monitor and control the power plant operations.")
+    "Through this system interface, you will be able to monitor and control the power plant operations.\n")
 
   /* main function to control REPS */
   def REPS_controller(): Unit = {
@@ -151,7 +165,9 @@ case object REPS extends App {
 
     /* asks user to perform action */
     val user_input: String = StdIn.readLine() // get user input
-    
+
+    read_file("C:\\Users\\annal\\Desktop\\IMPORTANT\\LUT\\Year2\\DMM2\\DMMProjectData\\ProjectData\\NumberOfEmployees.csv")    // PRACTICE, DELETE
+
     val entered_choice = user_input match {
       case "1" => control_mechanism_pos()
       case "2" => monitor_solar_wind()
