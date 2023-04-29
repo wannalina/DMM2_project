@@ -1,9 +1,8 @@
 package ProjectWork
 
-import scala.io.StdIn
-import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import scala.+:  // library to get current time
+import scala.io.StdIn   // perform basic I/O operations
+import java.time.LocalTime  // library to get current time
+import java.time.format.DateTimeFormatter   // format current time
 
 /* Renewable Energy Plant System control system program */
 case object REPS extends App {
