@@ -1,8 +1,9 @@
 package ProjectWork
 
-import scala.io.StdIn   // perform basic I/O operations
-import java.time.LocalTime    // get local time
-import java.time.format.DateTimeFormatter  // library to get current time
+import scala.io.StdIn
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
+import scala.+:  // library to get current time
 
 /* Renewable Energy Plant System control system program */
 case object REPS extends App {
@@ -22,26 +23,28 @@ case object REPS extends App {
     current_pos = pos
   }
 
-  // list of possible positions for solar panels and wind turbines
-  val energy_mechanism_positions: List[String] = List("North", "Northeast", "East", "Southeast", "South", "Southwest", "West", "Northwest")
-
   // create solar panels
   val SP1_panel: SolarPanel = new SolarPanel("SP1", "South") // solar panel SP1
   val SP2_panel: SolarPanel = new SolarPanel("SP2", "South") // solar panel SP2
   val SP3_panel: SolarPanel = new SolarPanel("SP3", "South") // solar panel SP3
+
+  // create list of solar panels in power plant
+  var solar_panel_list: List[SolarPanel] = List(SP1_panel, SP2_panel, SP3_panel)
 
   // create wind turbines
   val WT1_turbine = new WindTurbine("WT1", "East") // wind turbine WT1
   val WT2_turbine = new WindTurbine("WT2", "East") // wind turbine WT2
   val WT3_turbine = new WindTurbine("WT3", "East") // wind turbine WT3
 
+  // create list of wind turbines in power plant
+  var wind_turbine_list: List[WindTurbine] = List(WT1_turbine, WT2_turbine, WT3_turbine)
 
   // print basic information about REPS to user
   println("Hello and welcome to the Renewable Energy Plant System (REPS)!")
   println("This is multigeneration energy system plant that manages the production of renewable energy for cities and industries.\n" +
     "Through this system interface, you will be able to monitor and control the power plant operations.")
 
-  /* main program begins here */
+  /* main function to control REPS */
   def REPS_controller(): Unit = {
     println("Please choose an operation:\n" +
       "1) Adjust solar panel and wind turbine positions to optimize energy production\n" +
@@ -51,45 +54,19 @@ case object REPS extends App {
       "5) View warning signs that may hinder quality of energy production\n" +
       "0) Shut down system")
 
-    // create list of solar panels in power plant
-    val solar_panel_list: List[SolarPanel] = List(SP1_panel, SP2_panel, SP3_panel)
-    // create list of wind turbines in power plant
-    val wind_turbine_list: List[WindTurbine] = List(WT1_turbine, WT2_turbine, WT3_turbine)
-
     /* function to control solar panel and wind turbine position */
     def control_mechanism_pos(): Unit = {
       println("Please state the mechanism that you would like to control:\n1) Solar panel\n2) Wind turbine")
       val user_choice: String = StdIn.readLine() // get user input
-
-      if (user_choice == "1") {
-        println("Please state the solar panel to adjust:\n1) SP1\n2) SP2\n3) SP3")
-        val user_choice_2: String = StdIn.readLine() // get user input
-
-        // pattern matching for user choice
-        val mechanism = user_choice_2 match {
-          case "1" => adjust_solar("SP1")
-          case "2" => adjust_solar("SP2")
-          case "3" => adjust_solar("SP3")
-          case _ => "Incorrect choice, please try again..."
-        }
+      val operation = user_choice match {
+        case "1" => adjust_solar()
+        case "2" => adjust_wind()
+        case _ => println("This case does not exist.")
       }
-      else if (user_choice == "2") {
-        println("Please state the wind turbine to adjust:\n1) WT1\n2) WT2\n3) WT3")
-        val user_choice_2: String = StdIn.readLine() // get user input
-
-        // pattern matching for user choice
-        val mechanism = user_choice_2 match {
-          case "1" => adjust_wind("WT1")
-          case "2" => adjust_wind("WT2")
-          case "3" => adjust_wind("WT3")
-          case _ => "Incorrect choice, please try again..."
-        }
-      }
-      else "This choice does not exist, please try again..."
     }
 
-    /* function to get new position for solar panel */
-    def adjust_solar(panel_id: String): Unit = {
+    /* function to adjust solar panel positions */
+    def adjust_solar(): Unit = {
       /* find current direction of sun */
       def solar_direction(current_time: LocalTime): String = {
         if (current_time.isAfter(LocalTime.parse("06:00:00")) && current_time.isBefore(LocalTime.parse("09:00:00"))) {
@@ -109,23 +86,23 @@ case object REPS extends App {
           night_pos
         }
       }
-      println("The position of the solar panel will be adjusted according to the direction of the sunlight at this time of day in Southern Finland.\n")
-      val new_pos: String = solar_direction(LocalTime.now()) // function call to find direction of sun using current time
-      val index: Int = solar_panel_list.indexWhere(_.id_num == panel_id)
-      val solar_panel: SolarPanel = solar_panel_list(index)
 
-      val current_pos: String = solar_panel.current_pos // get current position of object
-      println(s"You have chosen to adjust the position of solar panel '$panel_id' currently facing '$current_pos'.")
-      solar_panel.current_pos = new_pos
+      println("The position of the solar panels will be adjusted according to the direction of the sunlight at this time of day in Southern Finland.")
+      val current_time: String = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm"))   // get current time and format
+      val new_pos: String = solar_direction(LocalTime.now())  // find direction of sun
 
-      val current_time: String = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")) // get current time and format
-      val message: String = s"The new position of object '$panel_id' is now facing '$new_pos' at $current_time.\n\n"
-      println(message)
-      REPS_controller() // recursive function call to main function to keep program running
-    }
+      // rotate each solar panel in power plant
+      val new_solar_panel_list = solar_panel_list.foldLeft(List.empty[SolarPanel]) {
+          (acc, panel: SolarPanel) =>
+            panel.current_pos = new_pos
+            panel :: acc
+        }
+      solar_panel_list = new_solar_panel_list
+      println(s"The solar panels are being rotated towards '$new_pos' at $current_time.\n\n")
+      }
 
-    /* function to get new position for wind turbine */
-    def adjust_wind(turbine_id: String): Unit = {
+    /* function to adjust wind turbine positions */
+    def adjust_wind(): Unit = {
       /* get direction of user choice */
       def get_direction(user_input: String): String = {
         // pattern matching for user choice
@@ -142,55 +119,40 @@ case object REPS extends App {
         }
         direction
       }
+
       println("Which direction would you like to rotate the wind turbine in:\n" +
         "1) North\n2) Northeast\n3) East\n4) Southeast\n5) South\n6) Southwest\n7) West\n8) Northwest")
       val user_input: String = StdIn.readLine() // get user input
       val new_pos = get_direction(user_input) // get direction of wind based on user input
-      val index: Int = wind_turbine_list.indexWhere(_.id_num == turbine_id)
-      val wind_turbine: WindTurbine = wind_turbine_list(index)
-
-      val current_pos: String = wind_turbine.current_pos // get current position of object
-      println(s"You have chosen to adjust the position of solar panel '$turbine_id' currently facing '$current_pos'.")
-      wind_turbine.current_pos = new_pos
-
       val current_time: String = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")) // get current time and format
-      val message: String = s"The new position of object '$turbine_id' is now facing '$new_pos' at $current_time.\n\n"
-      message
-      REPS_controller() // recursive function call to main function to keep program running
-    }
 
-    /* monitor all sun panels and wind turbines */
-    def monitor_solar_wind(): Unit = {
-      def get_list_items(list_name: List[EnergyMechanism]): Unit = {
-        val index: Int = 0
-
-        //
-        def recursive_func(list_name: List[EnergyMechanism], index: Int): Unit = {
-          if (index == list_name.length) ""
-          else {
-            val obj: EnergyMechanism = list_name(index)
-            val obj_id: String = obj.id_num
-            val obj_pos: String = obj.current_pos
-            println(s"$obj_id: currently facing $obj_pos")
-            recursive_func(list_name, index + 1)
-          }
-        }
-        recursive_func(list_name, index)
+      // rotate each wind turbine in power plant
+      val new_wind_turbine_list = wind_turbine_list.foldLeft(List.empty[WindTurbine]) {
+        (acc, turbine: WindTurbine) =>
+          turbine.current_pos = new_pos
+          turbine :: acc
       }
-      println("Solar panels and their current positions:")
-      get_list_items(solar_panel_list)
-      println("Wind turbines and their current positions:")
-      get_list_items(wind_turbine_list)
-      println("\n\n")
-
+      wind_turbine_list = new_wind_turbine_list
+      println(s"The wind turbines are now being rotated towards '$new_pos' at $current_time.\n\n")
       REPS_controller() // recursive function call to main function to keep program running
     }
 
+    /* monitor all sun panel and wind turbine positions */
+    def monitor_solar_wind(): Unit = {
 
+      println("Solar panels and their current positions:")
+      solar_panel_list.foreach(panel => println(s"Solar panel ${panel.id_num} is facing ${panel.current_pos}"))
 
+      println("Wind turbines and their current positions:")
+      wind_turbine_list.foreach(panel => println(s"Wind turbine ${panel.id_num} is facing ${panel.current_pos}"))
+      println("\n")
+
+      REPS_controller() // recursive function call to main function to keep program running
+    }
 
     /* asks user to perform action */
     val user_input: String = StdIn.readLine() // get user input
+    
     val entered_choice = user_input match {
       case "1" => control_mechanism_pos()
       case "2" => monitor_solar_wind()
