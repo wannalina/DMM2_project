@@ -1,0 +1,41 @@
+Date,Goods Category,Item,Quantity
+2023-04-01,Fuel,Diesel,20000 liters
+2023-04-01,Fuel,Gasoline,5000 liters
+2023-04-01,Maintenance and Repair,Lubricating Oil,150 liters
+2023-04-01,Maintenance and Repair,Filters,200 units
+2023-04-01,Maintenance and Repair,Spare Parts,50 units
+2023-04-01,Office and Supplies,Printer Ink,10 units
+2023-04-01,Office and Supplies,Printer Paper,20 reams
+2023-04-01,Office and Supplies,Stationeries,100 units
+2023-04-01,Safety Equipment,Safety Helmets,50 units
+2023-04-01,Safety Equipment,Safety Boots,50 pairs
+2023-04-01,Safety Equipment,Safety Vests,100 units
+2023-04-01,Cleaning and Sanitation,Cleaning Chemicals,50 liters
+2023-04-01,Cleaning and Sanitation,Cleaning Supplies,100 units
+2023-04-01,Cleaning and Sanitation,Toilet Paper,50 rolls
+2023-04-01,Food and Beverages,Bottled Water,500 units
+2023-04-01,Food and Beverages,Snacks,200 units
+2023-04-01,Food and Beverages,Coffee,20 kg
+2023-04-01,Miscellaneous,Light bulbs,50 units
+2023-04-01,Miscellaneous,Batteries,100 units
+2023-04-01,Miscellaneous,Tissue Paper,50 boxes
+2023-04-02,Fuel,Diesel,25000 liters
+2023-04-02,Fuel,Gasoline,6000 liters
+2023-04-02,Maintenance and Repair,Lubricating Oil,200 liters
+2023-04-02,Maintenance and Repair,Filters,250 units
+2023-04-02,Maintenance and Repair,Spare Parts,60 units
+2023-04-02,Office and Supplies,Printer Ink,15 units
+2023-04-02,Office and Supplies,Printer Paper,25 reams
+2023-04-02,Office and Supplies,Stationeries,120 units
+2023-04-02,Safety Equipment,Safety Helmets,60 units
+2023-04-02,Safety Equipment,Safety Boots,60 pairs
+2023-04-02,Safety Equipment,Safety Vests,120 units
+2023-04-02,Cleaning and Sanitation,Cleaning Chemicals,60 liters
+2023-04-02,Cleaning and Sanitation,Cleaning Supplies,120 units
+2023-04-02,Cleaning and Sanitation,Toilet Paper,60 rolls
+2023-04-02,Food and Beverages,Bottled Water,600 units
+2023-04-02,Food and Beverages,Snacks,250 units
+2023-04-02,Food and Beverages,Coffee,25 kg
+2023-04-02,Miscellaneous,Light bulbs,60 units
+2023-04-02,Miscellaneous,Batteries,120 units
+2023-04-02,Miscellaneous,Tissue Paper,60 boxes
