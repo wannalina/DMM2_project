@@ -1,23 +1,39 @@
 package ProjectWork
 
-import scala.io.StdIn   // perform basic I/O operations
+import scala.io.StdIn
 import scala.io.Source
 import java.time.LocalTime  // library to get current time
-import java.time.format.DateTimeFormatter   // format current time
+import java.time.format.DateTimeFormatter // format current time
 
 /* Renewable Energy Plant System control system program */
 case object REPS extends App {
 
-  /* function to read contents of .csv file */
-  def read_file(filename: String): Unit = {     // THIS FUNCTION IS STILL UNDER CONSTRUCTION
+  /* function to read contents of .csv file and returns list of contents */
+  def read_file(filename: String): Map[String, String] = {     // THIS FUNCTION IS STILL UNDER CONSTRUCTION
     val source = Source.fromFile(filename)
+    var contents: Map[String, String] = Map()
     try {
+      source.getLines.drop(0)   // ignore header line
+      // loops acceptable to read file as per teacher's instructions
       for (line <- source.getLines()) {
-        val fields = line.split(",")
-        println(fields.mkString(","))     // DO SOMETHING ELSE, NOT PRINT
+        val fields = line.split(",")  // split lines
+        val key = fields.head
+        val tail_vals = fields.tail
+        val value: String = tail_vals.mkString(",") // convert tail from serializable to string
+        contents = contents + (key -> value)
       }
+      contents // return map of file contents
     } finally {
       source.close()
+    }
+  }
+
+  /*  function to separate rows and columns in file content list */
+  def separate_content(contents: List[String]): Unit = {
+    //var map_contents: Map[]
+    for (line <- contents) {
+      val fields = line.split(",")
+      println(fields.mkString(",")) // DO SOMETHING ELSE, NOT PRINT
     }
   }
 
@@ -165,9 +181,6 @@ case object REPS extends App {
 
     /* asks user to perform action */
     val user_input: String = StdIn.readLine() // get user input
-
-    read_file("C:\\Users\\annal\\Desktop\\IMPORTANT\\LUT\\Year2\\DMM2\\DMMProjectData\\ProjectData\\NumberOfEmployees.csv")    // PRACTICE, DELETE
-
     val entered_choice = user_input match {
       case "1" => control_mechanism_pos()
       case "2" => monitor_solar_wind()
