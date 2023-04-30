@@ -8,6 +8,12 @@ import java.time.format.DateTimeFormatter // format current time
 /* Renewable Energy Plant System control system program */
 case object REPS extends App {
 
+  /* function to get current time as formatted string */
+  def get_current_time(): String = {
+    val current_time: String = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")) // get current time and format
+    current_time
+  }
+
   /* function to read contents of .csv file and returns list of contents */
   def read_file(filename: String): Map[String, String] = {
     val source = Source.fromFile(filename)
@@ -75,9 +81,10 @@ case object REPS extends App {
       "5) View warning signs that may hinder quality of energy production\n" +
       "0) Shut down system")
 
+    // trait to adjust solar panel and wind turbine positions
     trait Adjustable[-Type] {
       def adjust[A <: {def id_num: String; var current_pos: String}](obj_list: List[A], new_pos: String, current_time: String): Unit = {
-        // rotate each object in category
+        // reassign position of each object in category
         val new_obj_list = obj_list.map(obj => {
           obj.current_pos = new_pos
           obj
@@ -85,10 +92,11 @@ case object REPS extends App {
         println(s"The solar panels are being rotated towards '$new_pos' at ${current_time}.\n\n")
       }
     }
+    // objects to adjust solar panels and wind turbines
     object SolarAdjustable extends Adjustable[SolarPanel]
     object WindAdjustable extends Adjustable[WindTurbine]
 
-    /* find current direction of sun */
+    /* find current direction of sun according to time of day */
     def solar_direction(current_time: LocalTime): String = {
       if (current_time.isAfter(LocalTime.parse("06:00:00")) && current_time.isBefore(LocalTime.parse("09:00:00"))) {
         val morning_pos: String = "East"
@@ -128,43 +136,45 @@ case object REPS extends App {
       def control_mechanism_pos(): Unit = {
         println("Please state the mechanism that you would like to control:\n1) Solar panel\n2) Wind turbine")
         val user_choice: String = StdIn.readLine() // get user input
+        
+        // pattern matching to get operation of user's choice
         val operation = user_choice match {
-          case "1" => {
+          case "1" => {   // adjust solar panels
             println("The position of the solar panels will be adjusted according to the direction of the sunlight at this time of day in Southern Finland.")
-            val current_time: String = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")) // get current time and format
             val new_pos: String = solar_direction(LocalTime.now()) // find direction of sun
-            SolarAdjustable.adjust(solar_panel_list, new_pos, current_time)
+            SolarAdjustable.adjust(solar_panel_list, new_pos, get_current_time())   // adjust solar panel position
           }
-          case "2" => {
+          case "2" => {   // adjust wind turbines
             println("Which direction would you like to rotate the wind turbine in:\n" +
               "1) North\n2) Northeast\n3) East\n4) Southeast\n5) South\n6) Southwest\n7) West\n8) Northwest")
-            val user_input: String = StdIn.readLine() // get user input
+            val user_input: String = StdIn.readLine()
             val new_pos = get_direction(user_input) // get direction of wind based on user input
-            val current_time: String = LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm")) // get current time and format
-            WindAdjustable.adjust(wind_turbine_list, new_pos, current_time)
-            REPS_controller() // recursive function call to main function to keep program running
+            WindAdjustable.adjust(wind_turbine_list, new_pos, get_current_time())   // adjust wind turbine position
+            REPS_controller() 
           }
           case _ => println("This case does not exist.")
         }
       }
 
-      trait Monitorable[-Type] {
-        def monitor[A <: {def id_num: String; def current_pos: String}](obj_list: List[A], obj_type: String): Unit = {
-          println(s"${obj_type}s and their current positions:")
-          obj_list.foreach(obj => println(s"$obj_type ${obj.id_num} is facing ${obj.current_pos}"))
-        }
+    // trait to print current wind turbine and sun panel positions
+    trait Monitorable[-Type] {
+      /* function to print current positions */
+      def monitor[A <: {def id_num: String; def current_pos: String}](obj_list: List[A], obj_type: String): Unit = {
+        println(s"${obj_type}s and their current positions:")
+        obj_list.foreach(obj => println(s"$obj_type ${obj.id_num} is facing ${obj.current_pos}"))
       }
-      object SolarMonitorable extends Monitorable[SolarPanel]
-      object WindMonitorable extends Monitorable[WindTurbine]
+    }
+    // objects for solar panel and wind turbine position monitoring
+    object SolarMonitorable extends Monitorable[SolarPanel]
+    object WindMonitorable extends Monitorable[WindTurbine]
 
-      /* monitor all sun panel and wind turbine positions */
-      def monitor_solar_wind(): Unit = {
-        SolarMonitorable.monitor(solar_panel_list, "Solar panel")
-        WindMonitorable.monitor(wind_turbine_list, "Wind turbine")
-        println("\n")
-
-        REPS_controller() // recursive function call to main function to keep program running
-      }
+    /* monitor all sun panel and wind turbine positions */
+    def monitor_solar_wind(): Unit = {
+      SolarMonitorable.monitor(solar_panel_list, "Solar panel")   // print solar panel information
+      WindMonitorable.monitor(wind_turbine_list, "Wind turbine")  // print wind turbine information
+      println("\n")
+      REPS_controller()
+    }
 
     /* asks user to perform action */
     val user_input: String = StdIn.readLine() // get user input
@@ -176,10 +186,10 @@ case object REPS extends App {
       case "5" => "FUNCTION CALL FOR WARNING SIGNS HERE"
       case "0" => {
         println("Shutting down...")
-        sys.exit()
+        sys.exit()    // exit program
       }
     }
-    REPS_controller()
+    REPS_controller() // recursive function call to main function to keep program running
   }
   REPS_controller()
 }
