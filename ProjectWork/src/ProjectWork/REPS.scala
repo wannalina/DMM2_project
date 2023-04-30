@@ -75,6 +75,7 @@ case object REPS extends App {
       "5) View warning signs that may hinder quality of energy production\n" +
       "0) Shut down system")
 
+    
     /* function to control solar panel and wind turbine position */
     def control_mechanism_pos(): Unit = {
       println("Please state the mechanism that you would like to control:\n1) Solar panel\n2) Wind turbine")
@@ -150,22 +151,27 @@ case object REPS extends App {
       // rotate each wind turbine in power plant
       val new_wind_turbine_list = wind_turbine_list.foldLeft(List.empty[WindTurbine]) {
         (acc, turbine: WindTurbine) =>
+          println(s"The wind turbines are now being rotated from '${turbine.current_pos}' towards '$new_pos' at $current_time.\n")
           turbine.current_pos = new_pos
           turbine :: acc
       }
       wind_turbine_list = new_wind_turbine_list
-      println(s"The wind turbines are now being rotated towards '$new_pos' at $current_time.\n\n")
       REPS_controller() // recursive function call to main function to keep program running
     }
 
+    trait Monitorable[-Type] {
+      def monitor[A <: {def id_num: String; def current_pos: String}](obj_list: List[A], obj_type: String): Unit = {
+        println(s"${obj_type}s and their current positions:")
+        obj_list.foreach(obj => println(s"$obj_type ${obj.id_num} is facing ${obj.current_pos}"))
+      }
+    }
+    object SolarMonitorable extends Monitorable[SolarPanel]
+    object WindMonitorable extends Monitorable[WindTurbine]
+
     /* monitor all sun panel and wind turbine positions */
     def monitor_solar_wind(): Unit = {
-
-      println("Solar panels and their current positions:")
-      solar_panel_list.foreach(panel => println(s"Solar panel ${panel.id_num} is facing ${panel.current_pos}"))
-
-      println("Wind turbines and their current positions:")
-      wind_turbine_list.foreach(panel => println(s"Wind turbine ${panel.id_num} is facing ${panel.current_pos}"))
+      SolarMonitorable.monitor(solar_panel_list, "Solar panel")
+      WindMonitorable.monitor(wind_turbine_list, "Wind turbine")
       println("\n")
 
       REPS_controller() // recursive function call to main function to keep program running
