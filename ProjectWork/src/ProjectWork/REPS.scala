@@ -73,123 +73,126 @@ case object REPS extends App {
 
   /* main function to control REPS */
   def REPS_controller(): Unit = {
-    println("Please choose an operation:\n" +
-      "1) Adjust solar panel and wind turbine positions to optimize energy production\n" +
-      "2) Monitor all solar panels and wind turbines\n" +
-      "3) Overview of power plant activity\n" +
-      "4) Analyze energy production of the power plant\n" +
-      "5) View warning signs that may hinder quality of energy production\n" +
-      "0) Shut down system")
+    try {
+      println("Please choose an operation:\n" +
+        "1) Adjust solar panel and wind turbine positions to optimize energy production\n" +
+        "2) Monitor all solar panels and wind turbines\n" +
+        "3) Overview of power plant activity\n" +
+        "4) Analyze energy production of the power plant\n" +
+        "5) View warning signs that may hinder quality of energy production\n" +
+        "0) Shut down system")
 
-    // trait to adjust solar panel and wind turbine positions
-    trait Adjustable[-Type] {
-      def adjust[A <: {def id_num: String; var current_pos: String}](obj_list: List[A], new_pos: String, current_time: String): Unit = {
-        // reassign position of each object in category
-        val new_obj_list = obj_list.map(obj => {
-          obj.current_pos = new_pos
-          obj
-        })
-        println(s"The solar panels are being rotated towards '$new_pos' at ${current_time}.\n\n")
+      // trait to adjust solar panel and wind turbine positions
+      trait Adjustable[-Type] {
+        def adjust[A <: {def id_num: String; var current_pos: String}](obj_list: List[A], new_pos: String, current_time: String): Unit = {
+          // reassign position of each object in category
+          val new_obj_list = obj_list.map(obj => {
+            obj.current_pos = new_pos
+            obj
+          })
+          println(s"The solar panels are being rotated towards '$new_pos' at ${current_time}.\n\n")
+        }
       }
-    }
-    // objects to adjust solar panels and wind turbines
-    object SolarAdjustable extends Adjustable[SolarPanel]
-    object WindAdjustable extends Adjustable[WindTurbine]
+      // objects to adjust solar panels and wind turbines
+      object SolarAdjustable extends Adjustable[SolarPanel]
+      object WindAdjustable extends Adjustable[WindTurbine]
 
-    /* find current direction of sun according to time of day */
-    def solar_direction(current_time: LocalTime): String = {
-      if (current_time.isAfter(LocalTime.parse("06:00:00")) && current_time.isBefore(LocalTime.parse("09:00:00"))) {
-        val morning_pos: String = "East"
-        morning_pos
-      } else if (current_time.isAfter(LocalTime.parse("09:00:00")) && current_time.isBefore(LocalTime.parse("12:00:00"))) {
-        val noon_pos: String = "Southeast"
-        noon_pos
-      } else if (current_time.isAfter(LocalTime.parse("12:00:00")) && current_time.isBefore(LocalTime.parse("15:00:00"))) {
-        val afternoon_pos: String = "South"
-        afternoon_pos
-      } else if (current_time.isAfter(LocalTime.parse("15:00:00")) && current_time.isBefore(LocalTime.parse("18:00:00"))) {
-        val noon_pos: String = "Southwest"
-        noon_pos
-      } else {
-        val night_pos = "West"
-        night_pos
+      /* find current direction of sun according to time of day */
+      def solar_direction(current_time: LocalTime): String = {
+        if (current_time.isAfter(LocalTime.parse("06:00:00")) && current_time.isBefore(LocalTime.parse("09:00:00"))) {
+          val morning_pos: String = "East"
+          morning_pos
+        } else if (current_time.isAfter(LocalTime.parse("09:00:00")) && current_time.isBefore(LocalTime.parse("12:00:00"))) {
+          val noon_pos: String = "Southeast"
+          noon_pos
+        } else if (current_time.isAfter(LocalTime.parse("12:00:00")) && current_time.isBefore(LocalTime.parse("15:00:00"))) {
+          val afternoon_pos: String = "South"
+          afternoon_pos
+        } else if (current_time.isAfter(LocalTime.parse("15:00:00")) && current_time.isBefore(LocalTime.parse("18:00:00"))) {
+          val noon_pos: String = "Southwest"
+          noon_pos
+        } else {
+          val night_pos = "West"
+          night_pos
+        }
       }
-    }
-    /* get direction of user choice */
-    def get_direction(user_input: String): String = {
-      // pattern matching for user choice
-      val direction = user_input match {
-        case "1" => "North"
-        case "2" => "Northeast"
-        case "3" => "East"
-        case "4" => "Southeast"
-        case "5" => "South"
-        case "6" => "Southwest"
-        case "7" => "West"
-        case "8" => "Northwest"
-        case _ => "Incorrect choice, please try again..."
+
+      /* get direction of user choice */
+      def get_direction(user_input: String): String = {
+        // pattern matching for user choice
+        val direction = user_input match {
+          case "1" => "North"
+          case "2" => "Northeast"
+          case "3" => "East"
+          case "4" => "Southeast"
+          case "5" => "South"
+          case "6" => "Southwest"
+          case "7" => "West"
+          case "8" => "Northwest"
+          case _ => "Incorrect choice, please try again..."
+        }
+        direction
       }
-      direction
-    }
 
       /* function to control solar panel and wind turbine position */
       def control_mechanism_pos(): Unit = {
         println("Please state the mechanism that you would like to control:\n1) Solar panel\n2) Wind turbine")
         val user_choice: String = StdIn.readLine() // get user input
-        
+
         // pattern matching to get operation of user's choice
         val operation = user_choice match {
-          case "1" => {   // adjust solar panels
+          case "1" => { // adjust solar panels
             println("The position of the solar panels will be adjusted according to the direction of the sunlight at this time of day in Southern Finland.")
             val new_pos: String = solar_direction(LocalTime.now()) // find direction of sun
-            SolarAdjustable.adjust(solar_panel_list, new_pos, get_current_time())   // adjust solar panel position
+            SolarAdjustable.adjust(solar_panel_list, new_pos, get_current_time()) // adjust solar panel position
           }
-          case "2" => {   // adjust wind turbines
+          case "2" => { // adjust wind turbines
             println("Which direction would you like to rotate the wind turbine in:\n" +
               "1) North\n2) Northeast\n3) East\n4) Southeast\n5) South\n6) Southwest\n7) West\n8) Northwest")
             val user_input: String = StdIn.readLine()
             val new_pos = get_direction(user_input) // get direction of wind based on user input
-            WindAdjustable.adjust(wind_turbine_list, new_pos, get_current_time())   // adjust wind turbine position
-            REPS_controller() 
+            WindAdjustable.adjust(wind_turbine_list, new_pos, get_current_time()) // adjust wind turbine position
+            REPS_controller()
           }
           case _ => println("This case does not exist.")
         }
       }
 
-    // trait to print current wind turbine and sun panel positions
-    trait Monitorable[-Type] {
-      /* function to print current positions */
-      def monitor[A <: {def id_num: String; def current_pos: String}](obj_list: List[A], obj_type: String): Unit = {
-        println(s"${obj_type}s and their current positions:")
-        obj_list.foreach(obj => println(s"$obj_type ${obj.id_num} is facing ${obj.current_pos}"))
+      // trait to print current wind turbine and sun panel positions
+      trait Monitorable[-Type] {
+        /* function to print current positions */
+        def monitor[A <: {def id_num: String; def current_pos: String}](obj_list: List[A], obj_type: String): Unit = {
+          println(s"${obj_type}s and their current positions:")
+          obj_list.foreach(obj => println(s"$obj_type ${obj.id_num} is facing ${obj.current_pos}"))
+        }
       }
-    }
-    // objects for solar panel and wind turbine position monitoring
-    object SolarMonitorable extends Monitorable[SolarPanel]
-    object WindMonitorable extends Monitorable[WindTurbine]
+      // objects for solar panel and wind turbine position monitoring
+      object SolarMonitorable extends Monitorable[SolarPanel]
+      object WindMonitorable extends Monitorable[WindTurbine]
 
-    /* monitor all sun panel and wind turbine positions */
-    def monitor_solar_wind(): Unit = {
-      SolarMonitorable.monitor(solar_panel_list, "Solar panel")   // print solar panel information
-      WindMonitorable.monitor(wind_turbine_list, "Wind turbine")  // print wind turbine information
-      println("\n")
-      REPS_controller()
-    }
-
-    /* asks user to perform action */
-    val user_input: String = StdIn.readLine() // get user input
-    val entered_choice = user_input match {
-      case "1" => control_mechanism_pos()
-      case "2" => monitor_solar_wind()
-      case "3" => "FUNCTION CALL FOR OVERVIEW INFO HERE"
-      case "4" => "FUNCTION CALL FOR ENERGY PRODUCTION ANALYSIS HERE"
-      case "5" => "FUNCTION CALL FOR WARNING SIGNS HERE"
-      case "0" => {
-        println("Shutting down...")
-        sys.exit()    // exit program
+      /* monitor all sun panel and wind turbine positions */
+      def monitor_solar_wind(): Unit = {
+        SolarMonitorable.monitor(solar_panel_list, "Solar panel") // print solar panel information
+        WindMonitorable.monitor(wind_turbine_list, "Wind turbine") // print wind turbine information
+        println("\n")
+        REPS_controller()
       }
-    }
-    REPS_controller() // recursive function call to main function to keep program running
+
+      /* asks user to perform action */
+      val user_input: String = StdIn.readLine() // get user input
+      val entered_choice = user_input match {
+        case "1" => control_mechanism_pos()
+        case "2" => monitor_solar_wind()
+        case "3" => "FUNCTION CALL FOR OVERVIEW INFO HERE"
+        case "4" => "FUNCTION CALL FOR ENERGY PRODUCTION ANALYSIS HERE"
+        case "5" => "FUNCTION CALL FOR WARNING SIGNS HERE"
+        case "0" => {
+          println("Shutting down...")
+          sys.exit() // exit program
+        }
+      }
+      REPS_controller() // recursive function call to main function to keep program running
+    } catch { case e: Exception => println("Operation failed. The system shut down automatically.") }  // catch  exception
   }
   REPS_controller()
 }
