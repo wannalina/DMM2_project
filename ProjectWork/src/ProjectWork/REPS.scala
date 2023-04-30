@@ -9,31 +9,23 @@ import java.time.format.DateTimeFormatter // format current time
 case object REPS extends App {
 
   /* function to read contents of .csv file and returns list of contents */
-  def read_file(filename: String): Map[String, String] = {     // THIS FUNCTION IS STILL UNDER CONSTRUCTION
+  def read_file(filename: String): Map[String, String] = {
     val source = Source.fromFile(filename)
     var contents: Map[String, String] = Map()
     try {
-      source.getLines.drop(0)   // ignore header line
+      source.getLines.drop(0) // ignore header line
       // loops acceptable to read file as per teacher's instructions
       for (line <- source.getLines()) {
-        val fields = line.split(",")  // split lines
+        val fields = line.split(",") // split lines
         val key = fields.head
         val tail_vals = fields.tail
         val value: String = tail_vals.mkString(",") // convert tail from serializable to string
         contents = contents + (key -> value)
       }
       contents // return map of file contents
-    } finally {
+    } catch { case e: Exception => Map("error" -> "operation failed.") }  // catch  exception
+    finally {
       source.close()
-    }
-  }
-
-  /*  function to separate rows and columns in file content list */
-  def separate_content(contents: List[String]): Unit = {
-    //var map_contents: Map[]
-    for (line <- contents) {
-      val fields = line.split(",")
-      println(fields.mkString(",")) // DO SOMETHING ELSE, NOT PRINT
     }
   }
 
@@ -187,7 +179,10 @@ case object REPS extends App {
       case "3" => "FUNCTION CALL FOR OVERVIEW INFO HERE"
       case "4" => "FUNCTION CALL FOR ENERGY PRODUCTION ANALYSIS HERE"
       case "5" => "FUNCTION CALL FOR WARNING SIGNS HERE"
-      case "0" => sys.exit()
+      case "0" => {
+        println("Shutting down...")
+        sys.exit()
+      }
     }
     REPS_controller()
   }
