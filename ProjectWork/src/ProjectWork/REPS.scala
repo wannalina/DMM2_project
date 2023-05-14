@@ -126,7 +126,7 @@ case object REPS extends App {
             obj.current_pos = new_pos
             obj
           })
-          println(s"The solar panels are being rotated towards '$new_pos' at ${current_time}.\n\n")
+          println(s"The energy mechanisms are being rotated towards '$new_pos' at ${current_time}.\n\n")
         }
       }
       // objects to adjust solar panels and wind turbines
